@@ -1,12 +1,13 @@
 const inquirer = require('inquirer');
 const db = require('./db/connection');
+// Connect to database
 
 db.connect(err => {
     if (err) throw err;
     console.log('Connected to the employee database');
     employeeTracker();
 });
-
+// Handle errors and call main function when connection established
 function employeeTracker() {
     inquirer.prompt([
         {
@@ -16,6 +17,7 @@ function employeeTracker() {
             choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Log Out']
         }
     ]).then((answers) => {
+        // Handle user choice based on selection
         if (answers.prompt === 'View all departments') {
             db.query('SELECT * FROM department', (err, result) => {
                 if (err) throw err;
@@ -24,6 +26,7 @@ function employeeTracker() {
                 employeeTracker();
             });
         } else if (answers.prompt === 'View all roles') {
+            // Similar structure for viewing roles and employees
             db.query('SELECT * FROM role', (err, result) => {
                 if (err) throw err;
                 console.log("Viewing all roles: ");
@@ -38,6 +41,7 @@ function employeeTracker() {
                 employeeTracker();
             });
         } else if (answers.prompt === 'Add a department') {
+            // Prompt the user for new department name 
             inquirer.prompt([{
                 type: 'input',
                 name: 'department',
@@ -51,13 +55,16 @@ function employeeTracker() {
                     }
                 }
             }]).then((answers) => {
+                // Insert the new department into the database
                 db.query(`INSERT INTO department (name) VALUES (?)`, [answers.department], (err, result) => {
                     if (err) throw err;
                     console.log(`Added ${answers.department} to the database.`);
                     employeeTracker();
+                    // return to main menu
                 });
             });
         } else if (answers.prompt === 'Add a role') {
+            // Handle adding a role
             db.query(`SELECT * FROM department`, (err, result) => {
                 if (err) throw err;
 
@@ -105,6 +112,7 @@ function employeeTracker() {
                 });
             });
         } else if (answers.prompt === 'Add an employee') {
+            // handles adding an emplyee
             db.query(`SELECT * FROM role`, (err, roleResults) => {
                 if (err) throw err;
 
@@ -169,6 +177,7 @@ function employeeTracker() {
                 });
             });
         } else if (answers.prompt === 'Update an employee role') {
+            // Handle updating an employee's role
             db.query(`SELECT * FROM employee`, (err, employeeResults) => {
                 if (err) throw err;
 
@@ -201,6 +210,8 @@ function employeeTracker() {
                 });
             });
         } else if (answers.prompt === 'Log Out') {
+            // End the database connection
+
             db.end();
             console.log("Thank you, see you next time!");
         }
@@ -226,7 +237,7 @@ function employeeTracker() {
 //         }
 //     ]).then((answers) => {
 //         if (answers.prompt === 'View all departments') {
-//             db.query('SELECT * FROM department', (err, result) => {
+//            db.query('SELECT * FROM department', (err, result) => {
 //                 if (err) throw err;
 //                 console.log("Viewing all departments: ");
 //                 console.table(result);
